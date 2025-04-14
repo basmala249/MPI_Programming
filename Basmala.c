@@ -1,12 +1,7 @@
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
-const int buffer_size = 1000;
-
-int min(int a , int b){
-  if(a <= b)return a;
-  return b;
-}
+/* Problem 1  */
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
     MPI_Status status;
