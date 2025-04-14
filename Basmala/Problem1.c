@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
       printf("Please enter size of array...\n");
       int size ;
       scanf("%d" , &size);
-      printf("\nPlease enter array elements...\n\n");
+      printf("\nPlease enter array elements...\n");
       int arr[size] , i , a;
       for(i = 0 ; i < size ; i++){
         scanf("%d" , &a);
