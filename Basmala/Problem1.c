@@ -2,7 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+const int buffer_size = 1000;
 
+int min(int a , int b){
+  if(a <= b)return a;
+  return b;
+}
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
     MPI_Status status;
@@ -67,6 +72,7 @@ int main(int argc, char* argv[]) {
           }     
        }
        printf("Hello from slave# %d Max number in my partition is %d and index is %d .\n" , rank , mx , indx );
+       fflush(stdout);
        MPI_Send(&indx , 1, MPI_INT , 0 , 0 , MPI_COMM_WORLD);
     }
     
