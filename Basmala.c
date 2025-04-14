@@ -1,7 +1,13 @@
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
-/* Problem 1  */
+#include <limits.h>
+const int buffer_size = 1000;
+/*                                Problem 1                                    */
+int min(int a , int b){
+  if(a <= b)return a;
+  return b;
+}
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
     MPI_Status status;
@@ -20,7 +26,7 @@ int main(int argc, char* argv[]) {
       printf("Please enter size of array...\n");
       int size ;
       scanf("%d" , &size);
-      printf("Please enter array elements...\n");
+      printf("\nPlease enter array elements...\n\n");
       int arr[size] , i , a;
       for(i = 0 ; i < size ; i++){
         scanf("%d" , &a);
@@ -38,7 +44,7 @@ int main(int argc, char* argv[]) {
       }
       
       /* Recieve Portion  */
-      int mx = 0 , index = 0 ;
+      int mx = INT_MIN , index = -1 ;
       start = 0 ;
       for(i = 1 ; i < sz ; ++i){
          int indx1 ;
@@ -49,7 +55,7 @@ int main(int argc, char* argv[]) {
          }
          start += num_of_elemet_per_process + (i <= remindar ? 1 : 0);
       }
-      printf("Master process announce the final max which is %d and its index is %d .\n" , mx , index);
+      printf("Master process announce the final max which is %d and its index is %d .\n\n" , mx , index);
       printf("Thanks for using our program.\n");
     }
     else {
@@ -58,7 +64,7 @@ int main(int argc, char* argv[]) {
        int Size = (arrSize / (sz - 1)) + (rank <= (arrSize % (sz - 1)) ? 1 : 0);
        int buffer[Size];
        MPI_Recv(buffer , Size , MPI_INT , 0 , 0 , MPI_COMM_WORLD , 0);
-       int mx = 0 , indx = 0 , i;
+       int mx = INT_MIN , indx = -1 , i;
        for(i = 0 ; i < Size; ++i){
           if(buffer[i] > mx){
             mx = buffer[i] ;
