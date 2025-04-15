@@ -3,13 +3,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#define charSize 26
-char temp[charSize] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+#define charSize 91
+char temp[] = {
+    ' ', '!', '#', '$', '%', '&', '(', ')', '*', '+', ',', '-', '.', '/',
+    '0','1','2','3','4','5','6','7','8','9',
+    ':', ';', '<', '=', '>', '?', '@',
+    'A','B','C','D','E','F','G','H','I','J','K','L','M',
+    'N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+    '[','\\',']','^','_',
+    'a','b','c','d','e','f','g','h','i','j','k','l','m',
+    'n','o','p','q','r','s','t','u','v','w','x','y','z',
+    '{','|'
+};
 
 int getIndex(int a, int b){
   return (((((a % charSize) + (b % charSize)) % charSize) + charSize) % charSize);
 }
-
 int FindChar(char c , int val){
   int i ;
   for(i = 0 ; i < charSize ; ++i){
@@ -97,13 +106,15 @@ int main(int argc, char* argv[]) {
          MPI_Recv(&arrSize , 1 , MPI_INT , 0 , 0 , MPI_COMM_WORLD , 0);
          int num_of_chars_of_string = (arrSize / (sz - 1)) + (rank <= (arrSize % (sz - 1)) ? 1 : 0);
          
-         char buffer[num_of_chars_of_string] , Text[num_of_chars_of_string];
+         char buffer[num_of_chars_of_string] , Text[num_of_chars_of_string + 1];
          MPI_Recv(buffer , num_of_chars_of_string , MPI_CHAR , 0 , 0 , MPI_COMM_WORLD , 0);
          
          for(i = 0 ; i < num_of_chars_of_string ; ++i){
             Text[i] = temp[FindChar(buffer[i] , En_De)];
          }
-         
+         Text[num_of_chars_of_string] = '\0';
+         printf("Hello from slave# %d the final sentence %s \n" , rank , Text);
+         fflush(stdout);
          MPI_Send(Text, num_of_chars_of_string , MPI_CHAR , 0 , 0 , MPI_COMM_WORLD); 
     }
     
