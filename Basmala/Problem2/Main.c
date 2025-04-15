@@ -28,7 +28,9 @@ int FindChar(char c , int val){
   }
   return 0;
 }
+
 int main(int argc, char* argv[]) {
+
     MPI_Init(&argc, &argv);
     MPI_Status status;
     int sz;
@@ -44,24 +46,35 @@ int main(int argc, char* argv[]) {
         return 0;
       }
       
-      // Reading String Of Unknown Size From User
-      int size = 0;
+      int Choice;
+      printf("Read From File Enter 1 ; From Console Enter 2...\n");
+      scanf("%d" , Choice);
+      
+      int size = 0 , Num;
       int capacity = 100;
       char *sentence = malloc(capacity * sizeof(sentence)) , ch;
-      printf("Enter text...\n");
-      while ((ch = getchar()) != '\n' && ch != EOF) {
-        if (size >= capacity - 1) {
-            capacity *= 2;
-            char *temp = realloc(sentence, capacity);
-            sentence = temp;
-        }
-        sentence[size++] = ch;
-      }
-      sentence[size] = '\0';
+      if(Choice == 1){// From File
       
-      printf("For Encryption Enter 1 ; For Decryption Enter 2...\n");
-      int Num;
-      scanf("%d" , &Num);
+      }
+      else if(Choice == 2){// From Console
+          // Reading String Of Unknown Size From User
+          printf("Enter text...\n");
+          while ((ch = getchar()) != '\n' && ch != EOF) {
+            if (size >= capacity - 1) {
+                capacity *= 2;
+                char *temp = realloc(sentence, capacity);
+                sentence = temp;
+            }
+            sentence[size++] = ch;
+          }
+          sentence[size] = '\0';
+          
+          printf("For Encryption Enter 1 ; For Decryption Enter 2...\n");
+          
+          scanf("%d" , &Num);
+      }
+      
+      /*  Processing Part */
       
       int num_of_chars_per_processor = size / (sz - 1);
       int remainder = size % (sz - 1) , i, start = 0 , tot;
