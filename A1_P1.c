@@ -4,31 +4,24 @@
 
 int main(int argc, char* argv[]) {
     int rank, size, n, *array = NULL;
-
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank); 
     MPI_Comm_size(MPI_COMM_WORLD, &size); 
-
     if (rank == 0) {
         printf("Hello from master process.\n");
         printf("Number of slave processes is %d\n", size - 1);
         printf("Please enter size of array\n");
         scanf("%d", &n);
-
         array = (int*)malloc(n * sizeof(int));
         printf("Please enter array elements\n");
-        for (int i = 0; i < n; i++)
-            scanf("%d", &array[i]);
-
+        for (int i = 0; i < n; i++)  scanf("%d", &array[i]);
         int base = n / (size - 1), rem = n % (size - 1), start = 0;
-
         for (int i = 1; i < size; i++) {
             int count = base + (i <= rem ? 1 : 0);
             MPI_Send(&count, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
             MPI_Send(array + start, count, MPI_INT, i, 0, MPI_COMM_WORLD);
             start += count;
         }
-
         int global_max = array[0], global_index = 0, max_val, idx, offset = 0;
         start = 0;
         for (int i = 1; i < size; i++) {
@@ -41,7 +34,6 @@ int main(int argc, char* argv[]) {
             }
             start += count;
         }
-
         printf("Master process announce the final max which is %d and its index is %d.\n", global_max, global_index);
         free(array);
     } 
@@ -58,13 +50,11 @@ int main(int argc, char* argv[]) {
                 index = i;
             }
         }
-
         printf("Hello from slave#%d Max number in my partition is %d and index is %d.\n", rank, max, index);
         MPI_Send(&max, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
         MPI_Send(&index, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
         free(sub_array);
     }
-
     MPI_Finalize();
     return 0;
 }
