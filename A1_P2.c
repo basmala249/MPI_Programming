@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
+    // Master 👑
     if (rank == 0) {
         printf("Enter input mode (c for console, f for file): ");
         fflush(stdout);
@@ -25,9 +26,10 @@ int main(int argc, char *argv[]) {
         scanf(" %c", &mode);
         shift = (mode == 'e') ? 3 : -3;
         char buffer[1001];
+        // read from file
         if (input_mode == 'f') {
             char filename[100];
-            printf("Enter filename: ");
+            printf("Enter file name: ");
             fflush(stdout);
             scanf("%s", filename);
             FILE *fp = fopen(filename, "r");
@@ -46,27 +48,27 @@ int main(int argc, char *argv[]) {
         }
         len = strlen(buffer);
         text = buffer;
-        int base = len / (size - 1), rem = len % (size - 1), start = 0;
+        int base = len / (size-1), rem = len % (size-1), indx = 0;
         for (int i = 1; i < size; i++) {
             int count = base + (i <= rem ? 1 : 0);
             MPI_Send(&count, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
-            MPI_Send(text + start, count, MPI_CHAR, i, 0, MPI_COMM_WORLD);
+            MPI_Send(text + indx, count, MPI_CHAR, i, 0, MPI_COMM_WORLD); // points to the start of sub string
             MPI_Send(&shift, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
-            start += count;
+            indx += count;
         }
         char *result = (char *)malloc(len + 1);
-        start = 0;
+        indx = 0;
         for (int i = 1; i < size; i++) {
             int count = base + (i <= rem ? 1 : 0);
-            MPI_Recv(result + start, count, MPI_CHAR, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            start += count;
+            MPI_Recv(result + indx, count, MPI_CHAR, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            indx += count;
         }
-        result[len] = '\0';
-
+        result[len] = '\0'; // null terminated
         printf("Result: %s\n", result);
         fflush(stdout);
         free(result);
     } 
+    // ***** Slaves 👷🏻‍♂️ ****************
     else {
         int count;
         MPI_Recv(&count, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
