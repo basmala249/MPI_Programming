@@ -17,14 +17,11 @@ int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-
     if (rank == 0) {
-        // MASTER
         printf("Enter 'e' to encrypt or 'd' to decrypt: ");
         fflush(stdout);
         scanf(" %c", &mode);
         shift = (mode == 'e') ? 3 : -3;
-
         printf("Enter string (max 100): ");
         fflush(stdout);
         char input[101];
@@ -63,7 +60,6 @@ int main(int argc, char *argv[]) {
         MPI_Send(sub, count, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
         free(sub);
     }
-
     MPI_Finalize();
     return 0;
 }
