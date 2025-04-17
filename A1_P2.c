@@ -12,22 +12,40 @@ void caesar(char *str, int n, int shift) {
 int main(int argc, char *argv[]) {
     int rank, size, len, shift;
     char *text = NULL;
-    char mode;
-
+    char mode, input_mode;
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     if (rank == 0) {
+        printf("Enter input mode (c for console, f for file): ");
+        fflush(stdout);
+        scanf(" %c", &input_mode);
         printf("Enter 'e' to encrypt or 'd' to decrypt: ");
         fflush(stdout);
         scanf(" %c", &mode);
         shift = (mode == 'e') ? 3 : -3;
-        printf("Enter string (max 100): ");
-        fflush(stdout);
-        char input[101];
-        scanf("%s", input);
-        len = strlen(input);
-        text = input;
+        char buffer[1001];
+        if (input_mode == 'f') {
+            char filename[100];
+            printf("Enter filename: ");
+            fflush(stdout);
+            scanf("%s", filename);
+            FILE *fp = fopen(filename, "r");
+            if (!fp) {
+                printf("Error opening file.\n");
+                fflush(stdout);
+                MPI_Abort(MPI_COMM_WORLD, 1);
+            }
+            fgets(buffer, sizeof(buffer), fp);
+            fclose(fp);
+        } 
+        else {
+            printf("Enter string (max 1000): ");
+            fflush(stdout);
+            scanf("%s", buffer);
+        }
+        len = strlen(buffer);
+        text = buffer;
         int base = len / (size - 1), rem = len % (size - 1), start = 0;
         for (int i = 1; i < size; i++) {
             int count = base + (i <= rem ? 1 : 0);
@@ -44,6 +62,7 @@ int main(int argc, char *argv[]) {
             start += count;
         }
         result[len] = '\0';
+
         printf("Result: %s\n", result);
         fflush(stdout);
         free(result);
